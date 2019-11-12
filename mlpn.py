@@ -1,14 +1,17 @@
 import numpy as np
 
-STUDENT={'name': 'YOUR NAME',
-         'ID': 'YOUR ID NUMBER'}
+STUDENT = {'name': 'Tal Levy',
+           'ID': '---'}
+
 
 def classifier_output(x, params):
     # YOUR CODE HERE.
     return probs
 
+
 def predict(x, params):
     return np.argmax(classifier_output(x, params))
+
 
 def loss_and_gradients(x, y, params):
     """
@@ -29,6 +32,7 @@ def loss_and_gradients(x, y, params):
     """
     # YOU CODE HERE
     return ...
+
 
 def create_classifier(dims):
     """
