@@ -18,8 +18,10 @@ def gradient_check(f, x):
     it = np.nditer(x, flags=['multi_index'], op_flags=['readwrite'])
     while not it.finished:
         ix = it.multi_index
-        x_minus = copy.deepcopy(x[ix]) - h
-        x_plus = copy.deepcopy(x[ix]) + h
+        x_minus = copy.deepcopy(x)
+        x_plus = copy.deepcopy(x)
+        x_minus[ix] -= h
+        x_plus[ix] += h
         cost_plus, _ = f(x_plus)
         cost_minus, _ = f(x_minus)
         numeric_gradient = (cost_plus - cost_minus) / (2 * h)

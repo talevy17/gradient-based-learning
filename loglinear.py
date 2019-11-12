@@ -26,7 +26,8 @@ def classifier_output(x, params):
     of a log-linear classifier with given params on input x.
     """
     W, b = params
-    probs = softmax(np.dot(W, x) + b)
+    _x = np.asarray(x)
+    probs = softmax(np.dot(_x, W) + b)
     return probs
 
 
@@ -56,8 +57,8 @@ def loss_and_gradients(x, y, params):
     """
     W, b = params
     # YOU CODE HERE
-    rows = W[: 0].size
-    cols = W[0:].size
+    rows = W.shape[0]
+    cols = W.shape[1]
     pred_vec = classifier_output(x, params)
     y_vec = np.zeros(len(pred_vec))
     y_vec[y] = 1
