@@ -34,8 +34,8 @@ def loss_and_gradients(x, y, params):
     gU: matrix, gradients of U
     gb_tag: vector, gradients of b_tag
     """
-    # YOU CODE HERE
-    return ...
+    W, b, U, b_tag = params
+    return loss, [gW, gb, gU, gb_tag]
 
 
 def create_classifier(in_dim, hid_dim, out_dim):
