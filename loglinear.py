@@ -10,12 +10,6 @@ def softmax(x):
     x: a n-dim vector (numpy array)
     returns: an n-dim vector (numpy array) of softmax values
     """
-    # YOUR CODE HERE
-    # Your code should be fast, so use a vectorized implementation using numpy,
-    # don't use any loops.
-    # With a vectorized implementation, the code should be no more than 2 lines.
-    #
-    # For numeric stability, use the identify you proved in Ex 2 Q1.
     e_x = np.exp(x - np.max(x))
     return e_x / e_x.sum(axis=0)
 

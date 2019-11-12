@@ -1,12 +1,17 @@
 import numpy as np
+import utils as ut
 
 STUDENT = {'name': 'Tal Levy',
            'ID': '---'}
 
 
 def classifier_output(x, params):
-    # YOUR CODE HERE.
-    return probs
+    W, b, U, b_tag = params
+    h = np.dot(x, W) + b
+    g = np.vectorize(ut.relu)
+    h = g(h)
+    probs = np.dot(h, U) + b_tag
+    return ut.softmax(probs)
 
 
 def predict(x, params):
