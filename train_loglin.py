@@ -15,11 +15,13 @@ def feats_to_vec(features):
 def accuracy_on_dataset(dataset, params):
     good = bad = 0.0
     for label, features in dataset:
-        # YOUR CODE HERE
-        # Compute the accuracy (a scalar) of the current parameters
-        # on the dataset.
-        # accuracy is (correct_predictions / all_predictions)
-        pass
+        x = feats_to_vec(features)
+        y = label
+        pred = ll.predict(x, params)
+        if pred == y:
+            good += 1
+        else:
+            bad += 1
     return good / (good + bad)
 
 
