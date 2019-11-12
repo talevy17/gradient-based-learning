@@ -26,6 +26,17 @@ def relu(x):
     return max(0, x)
 
 
+def relu_derivative(x):
+    '''
+    calculate relu derivative.
+    :param x: paramter.
+    :return: relu derivative 1 or 0.
+    '''
+    if x > 0:
+        return 1
+    return 0
+
+
 def softmax(x):
     """
     Compute the softmax vector.

@@ -5,11 +5,15 @@ STUDENT = {'name': 'Tal Levy',
            'ID': '---'}
 
 
-def classifier_output(x, params):
-    W, b, U, b_tag = params
+def get_hidden(x, W, b):
     h = np.dot(x, W) + b
     g = np.vectorize(ut.relu)
-    h = g(h)
+    return g(h)
+
+
+def classifier_output(x, params):
+    W, b, U, b_tag = params
+    h = get_hidden(x, W, b)
     probs = np.dot(h, U) + b_tag
     return ut.softmax(probs)
 
@@ -35,6 +39,17 @@ def loss_and_gradients(x, y, params):
     gb_tag: vector, gradients of b_tag
     """
     W, b, U, b_tag = params
+    pred_vec = classifier_output(x, params)
+    y_vec = np.zeros(len(pred_vec))
+    y_vec[y] = 1
+    gb_tag = pred_vec - y_vec
+    gU = np.dot(get_hidden(x, W, b), gb_tag)
+    dl_dh = np.dot(U, gb_tag)
+    relu_der = np.vectorize(ut.relu_derivative)
+    dh_dz1 = relu_der(np.dot(x, W) + b)
+    gb = np.dot(dl_dh, dh_dz1)
+    gW = np.dot(np.dot(dl_dh, x), dh_dz1)
+    loss = -np.log(pred_vec[y])
     return loss, [gW, gb, gU, gb_tag]
 
 
@@ -47,6 +62,9 @@ def create_classifier(in_dim, hid_dim, out_dim):
     return:
     a flat list of 4 elements, W, b, U, b_tag.
     """
-    params = []
-    return params
+    W = np.zeros(in_dim, hid_dim)
+    b = np.zeros(hid_dim)
+    U = np.zeros(hid_dim, out_dim)
+    b_tag = np.zeros(out_dim)
+    return [W, b, U, b_tag]
 
