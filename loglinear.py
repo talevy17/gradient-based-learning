@@ -16,7 +16,8 @@ def softmax(x):
     # With a vectorized implementation, the code should be no more than 2 lines.
     #
     # For numeric stability, use the identify you proved in Ex 2 Q1.
-    return x
+    e_x = np.exp(x - np.max(x))
+    return e_x / e_x.sum(axis=0)
 
 
 def classifier_output(x, params):
@@ -25,7 +26,7 @@ def classifier_output(x, params):
     of a log-linear classifier with given params on input x.
     """
     W, b = params
-    # YOUR CODE HERE.
+    probs = softmax(np.dot(W, x) + b)
     return probs
 
 
@@ -55,6 +56,18 @@ def loss_and_gradients(x, y, params):
     """
     W, b = params
     # YOU CODE HERE
+    rows = W[: 0].size
+    cols = W[0:].size
+    pred_vec = classifier_output(x, params)
+    y_vec = np.zeros(len(pred_vec))
+    y_vec[y] = 1
+    gb = pred_vec - y_vec
+    loss = -np.log(pred_vec[y])
+    gW = np.zeros((rows, cols))
+    for i in range(rows):
+        for j in range(cols):
+            gW[i, j] = -x[i] * ((y == j) - pred_vec[j])
+
     return loss, [gW, gb]
 
 
