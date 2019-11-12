@@ -1,4 +1,5 @@
 import numpy as np
+import copy
 
 STUDENT = {'name': 'Tal Levy',
            'ID': '---'}
@@ -17,12 +18,11 @@ def gradient_check(f, x):
     it = np.nditer(x, flags=['multi_index'], op_flags=['readwrite'])
     while not it.finished:
         ix = it.multi_index
-
-        ### modify x[ix] with h defined above to compute the numerical gradient.
-        ### if you change x, make sure to return it back to its original state for the next iteration.
-        ### YOUR CODE HERE:
-        raise NotImplementedError
-        ### END YOUR CODE
+        x_minus = copy.deepcopy(x[ix]) - h
+        x_plus = copy.deepcopy(x[ix]) + h
+        cost_plus, _ = f(x_plus)
+        cost_minus, _ = f(x_minus)
+        numeric_gradient = (cost_plus - cost_minus) / (2 * h)
 
         # Compare gradients
         reldiff = abs(numeric_gradient - grad[ix]) / max(1, abs(numeric_gradient), abs(grad[ix]))
