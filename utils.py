@@ -2,6 +2,7 @@
 # Use it if you want, or ignore it.
 import random
 from collections import Counter
+import numpy as np
 
 
 def read_data(fname):
