@@ -3,6 +3,7 @@ import numpy as np
 import random
 import utils as ut
 import math
+from xor_data import data as xor_data
 
 STUDENT = {'name': 'Tal Levy',
            'ID': '---'}
@@ -26,10 +27,10 @@ def test_predictions(dataset, params, f2I, i2L):
             file.write(i2L[pred])
 
 
-def accuracy_on_dataset(dataset, params, f2I, l2I):
+def accuracy_on_dataset(dataset, params, f2I, l2I, feat_parser=feats_to_vec):
     good = bad = 0.0
     for label, features in dataset:
-        x = feats_to_vec(features, f2I)
+        x = feat_parser(features, f2I)
         y = l2I[label]
         pred = model.predict(x, params)
         if pred == y:
@@ -39,7 +40,8 @@ def accuracy_on_dataset(dataset, params, f2I, l2I):
     return good / (good + bad)
 
 
-def train_classifier(train_data, dev_data, num_iterations, learning_rate, learning_decay, params, f2I, l2I):
+def train_classifier(train_data, dev_data, params, f2I, l2I, feat_parser=feats_to_vec, learning_rate=1.0,
+                     learning_decay=np.inf, num_iterations=30):
     """
     Create and train a classifier, and return the parameters.
 
@@ -57,7 +59,7 @@ def train_classifier(train_data, dev_data, num_iterations, learning_rate, learni
         if I == learning_decay or I == learning_decay * 2:
             lr /= 10
         for label, features in train_data:
-            x = feats_to_vec(features, f2I)  # convert features to a vector.
+            x = feat_parser(features, f2I)  # convert features to a vector.
             y = l2I[label]  # convert the label to number if needed.
             loss, grads = model.loss_and_gradients(x, y, [W, b, U, b_tag])
             cum_loss += loss
@@ -68,13 +70,13 @@ def train_classifier(train_data, dev_data, num_iterations, learning_rate, learni
             b_tag -= gb_tag * learning_rate
 
         train_loss = cum_loss / len(train_data)
-        train_accuracy = accuracy_on_dataset(train_data, params, f2I, l2I)
-        dev_accuracy = accuracy_on_dataset(dev_data, params, f2I, l2I)
+        train_accuracy = accuracy_on_dataset(train_data, params, f2I, l2I, feat_parser=feat_parser)
+        dev_accuracy = accuracy_on_dataset(dev_data, params, f2I, l2I, feat_parser=feat_parser)
         print(I, train_loss, train_accuracy, dev_accuracy)
     return [W, b, U, b_tag]
 
 
-def main():
+def bigram_model():
     train_data = ut.TRAIN
     l2I = ut.L2I
     f2I = ut.F2I
@@ -83,17 +85,52 @@ def main():
     test_data = ut.TEST
     in_dim = len(ut.vocab)
     out_dim = len(l2I)
-    hid_dim = int((2 ** math.floor(math.log2(in_dim - out_dim))) / 2)
-    # hid_dim = 100
+    hid_dim = int(2 ** (math.floor(math.log(in_dim - out_dim))) / 2)
     num_iterations = 30
     learning_rate = 0.1
     learning_decay = 10
 
     params = model.create_classifier(in_dim, hid_dim, out_dim)
-    trained_params = train_classifier(train_data, dev_data, num_iterations, learning_rate, learning_decay, params, f2I,
-                                      l2I)
+    trained_params = train_classifier(train_data, dev_data, params, f2I, l2I, learning_rate=learning_rate,
+                                      learning_decay=learning_decay)
     # test_predictions(test_data, trained_params, f2I, i2L)
 
 
+def unigram_model():
+    train_data = ut.TRAIN_UNI
+    l2I = ut.L2I_UNI
+    f2I = ut.F2I_UNI
+    i2L = ut.I2L_UNI
+    dev_data = ut.DEV_UNI
+    test_data = ut.TEST
+    in_dim = len(ut.vocab_uni)
+    out_dim = len(l2I)
+    hid_dim = int(2 ** (math.floor(math.log(in_dim - out_dim))) / 2)
+    num_iterations = 30
+    learning_rate = 1
+    learning_decay = 10
+
+    params = model.create_classifier(in_dim, hid_dim, out_dim)
+    trained_params = train_classifier(train_data, dev_data, params, f2I, l2I, learning_rate=learning_rate,
+                                      learning_decay=learning_decay)
+    # test_predictions(test_data, trained_params, f2I, i2L)
+
+
+def xor_model():
+    train_data = xor_data
+    dev_data = xor_data
+    in_dim = 2
+    out_dim = 2
+    hid_dim = 4
+    epochs = 20
+    f2I = lambda x: x
+    l2I = {0: 0, 1: 1}
+
+    params = model.create_classifier(in_dim, hid_dim, out_dim)
+    trained_params = train_classifier(train_data, dev_data, params, f2I, l2I,
+                                      feat_parser=lambda feats, x: np.asarray(feats),
+                                      num_iterations=epochs, learning_decay=5)
+
+
 if __name__ == '__main__':
-    main()
+    xor_model()

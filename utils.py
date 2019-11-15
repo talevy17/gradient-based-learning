@@ -18,6 +18,10 @@ def text_to_bigrams(text):
     return ["%s%s" % (c1, c2) for c1, c2 in zip(text, text[1:])]
 
 
+def text_to_unigrams(text):
+    return ["%s" % char for char in text]
+
+
 def relu(x):
     '''
     relu function get max between(0,x)
@@ -57,13 +61,21 @@ TRAIN = [(l, text_to_bigrams(t)) for l, t in read_data("./Dataset/train")]
 DEV = [(l, text_to_bigrams(t)) for l, t in read_data("./Dataset/dev")]
 TEST = [(l, text_to_bigrams(t)) for l, t in read_data("./Dataset/test")]
 
+TRAIN_UNI = [(l, text_to_unigrams(t)) for l, t in read_data("./Dataset/train")]
+DEV_UNI = [(l, text_to_unigrams(t)) for l, t in read_data("./Dataset/dev")]
 
 fc = Counter()
 for l, feats in TRAIN:
     fc.update(feats)
 
+fc_uni = Counter()
+for l, feats in TRAIN_UNI:
+    fc_uni.update(feats)
+
 # 600 most common bigrams in the training set.
 vocab = set([x for x, c in fc.most_common(600)])
+
+vocab_uni = set([x for x, c in fc_uni.most_common(600)])
 
 # label strings to IDs
 L2I = {l: i for i, l in enumerate(list(sorted(set([l for l, t in TRAIN]))))}
@@ -72,3 +84,14 @@ I2L = {i: l for i, l in enumerate(list(sorted(set([l for l, t in TRAIN]))))}
 # feature strings (bigrams) to IDs
 F2I = {f: i for i, f in enumerate(list(sorted(vocab)))}
 
+# label strings to IDs
+L2I_UNI = {l: i for i, l in enumerate(list(sorted(set([l for l, t in TRAIN_UNI]))))}
+# IDs to label strings
+I2L_UNI = {i: l for i, l in enumerate(list(sorted(set([l for l, t in TRAIN_UNI]))))}
+# feature strings (bigrams) to IDs
+F2I_UNI = {f: i for i, f in enumerate(list(sorted(vocab_uni)))}
+
+def xavier_init(in_dim, out_dim = None):
+    if out_dim is None:
+        return np.random.randn(in_dim)/np.sqrt(in_dim/2)
+    return np.random.randn(in_dim,out_dim)/np.sqrt(2/out_dim)

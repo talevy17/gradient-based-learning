@@ -63,9 +63,19 @@ def create_classifier(in_dim, hid_dim, out_dim):
     return:
     a flat list of 4 elements, W, b, U, b_tag.
     """
-    W = np.random.randn(in_dim, hid_dim)
-    b = np.random.randn(hid_dim)
-    U = np.random.randn(hid_dim, out_dim)
-    b_tag = np.random.randn(out_dim)
+    # W = np.random.randn(in_dim, hid_dim)
+    # b = np.random.randn(hid_dim)
+    # U = np.random.randn(hid_dim, out_dim)
+    # b_tag = np.random.randn(out_dim)
+
+    # W = ut.xavier_init(in_dim,hid_dim)
+    # b = ut.xavier_init(hid_dim)
+    # U = ut.xavier_init(hid_dim, out_dim)
+    # b_tag = ut.xavier_init(out_dim)
+
+    W = np.random.randn(in_dim, hid_dim) * np.sqrt(2 / (hid_dim + in_dim))
+    b = np.random.randn(hid_dim) * np.sqrt(1 / hid_dim)
+    U = np.random.randn(hid_dim, out_dim) * np.sqrt(2 / (hid_dim + out_dim))
+    b_tag = np.random.randn(out_dim) * np.sqrt(1 / out_dim)
     return [W, b, U, b_tag]
 

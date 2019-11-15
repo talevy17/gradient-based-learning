@@ -89,7 +89,7 @@ def main():
     params = ll.create_classifier(in_dim, out_dim)
     trained_params = train_classifier(train_data, dev_data, num_iterations, learning_rate, learning_decay, params, f2I,
                                       l2I)
-    test_predictions(test_data, trained_params, f2I, i2L)
+    # test_predictions(test_data, trained_params, f2I, i2L)
 
 
 if __name__ == '__main__':
