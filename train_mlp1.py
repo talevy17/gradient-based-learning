@@ -39,13 +39,6 @@ def accuracy_on_dataset(dataset, params, f2I, l2I):
     return good / (good + bad)
 
 
-def update(params, gradients, learning_rate):
-    W, b, U, b_tag = params
-    dW, db, dU, db_tag = [np.dot(learning_rate, g) for g in gradients]
-    W, b, U, b_tag = W - dW, b - db, U - dU, b_tag - db_tag
-    return [W, b, U, b_tag]
-
-
 def train_classifier(train_data, dev_data, num_iterations, learning_rate, learning_decay, params, f2I, l2I):
     """
     Create and train a classifier, and return the parameters.
@@ -56,25 +49,29 @@ def train_classifier(train_data, dev_data, num_iterations, learning_rate, learni
     learning_rate: the learning rate to use.
     params: list of parameters (initial values)
     """
-    _params = params
+    W, b, U, b_tag = params
     lr = learning_rate
     for I in range(num_iterations):
         cum_loss = 0.0  # total loss in this iteration.
         random.shuffle(train_data)
-        if I == learning_decay:
+        if I == learning_decay or I == learning_decay * 2:
             lr /= 10
         for label, features in train_data:
             x = feats_to_vec(features, f2I)  # convert features to a vector.
             y = l2I[label]  # convert the label to number if needed.
-            loss, grads = model.loss_and_gradients(x, y, _params)
+            loss, grads = model.loss_and_gradients(x, y, [W, b, U, b_tag])
             cum_loss += loss
-            _params = update(_params, grads, lr)
+            gW, gb, gU, gb_tag = grads
+            W -= gW * learning_rate
+            b -= gb * learning_rate
+            U -= gU * learning_rate
+            b_tag -= gb_tag * learning_rate
 
         train_loss = cum_loss / len(train_data)
         train_accuracy = accuracy_on_dataset(train_data, params, f2I, l2I)
         dev_accuracy = accuracy_on_dataset(dev_data, params, f2I, l2I)
         print(I, train_loss, train_accuracy, dev_accuracy)
-    return _params
+    return [W, b, U, b_tag]
 
 
 def main():
@@ -86,11 +83,11 @@ def main():
     test_data = ut.TEST
     in_dim = len(ut.vocab)
     out_dim = len(l2I)
-    hid_dim = 2 ** math.floor(math.log2(in_dim - out_dim))
+    hid_dim = int((2 ** math.floor(math.log2(in_dim - out_dim))) / 2)
     # hid_dim = 100
-    num_iterations = 10
-    learning_rate = 0.01
-    learning_decay = 5
+    num_iterations = 30
+    learning_rate = 0.1
+    learning_decay = 10
 
     params = model.create_classifier(in_dim, hid_dim, out_dim)
     trained_params = train_classifier(train_data, dev_data, num_iterations, learning_rate, learning_decay, params, f2I,

@@ -27,6 +27,10 @@ def relu(x):
     return max(0, x)
 
 
+def tanh_derivative(x):
+    return 1 - (np.tanh(x) ** 2)
+
+
 def relu_derivative(x):
     '''
     calculate relu derivative.
@@ -44,8 +48,9 @@ def softmax(x):
     x: a n-dim vector (numpy array)
     returns: an n-dim vector (numpy array) of softmax values
     """
-    e_x = np.exp(x - np.max(x))
-    return e_x / e_x.sum(axis=0)
+    ex = np.exp(x - np.max(x))
+    x = ex / ex.sum(axis=0)
+    return x
 
 
 TRAIN = [(l, text_to_bigrams(t)) for l, t in read_data("./Dataset/train")]

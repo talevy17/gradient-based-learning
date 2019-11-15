@@ -7,8 +7,7 @@ STUDENT = {'name': 'Tal Levy',
 
 def get_hidden(x, W, b):
     h = np.dot(x, W) + b
-    g = np.vectorize(ut.relu)
-    return g(h)
+    return np.tanh(h)
 
 
 def classifier_output(x, params):
@@ -23,16 +22,6 @@ def predict(x, params):
     params: a list of the form [W, b, U, b_tag]
     """
     return np.argmax(classifier_output(x, params))
-
-
-def calc_grad(W, pred_vec, x, y):
-    rows = W.shape[0]
-    cols = W.shape[1]
-    gW = np.zeros((rows, cols))
-    for i in range(rows):
-        for j in range(cols):
-            gW[i, j] = -x[i] * ((y == j) - pred_vec[j])
-    return gW
 
 
 def loss_and_gradients(x, y, params):
@@ -53,15 +42,15 @@ def loss_and_gradients(x, y, params):
     y_vec = np.zeros(len(pred_vec))
     y_vec[y] = 1
     gb_tag = pred_vec - y_vec
+    sub = gb_tag.reshape(-1, 1)
     h = get_hidden(x, W, b)
-    gU = calc_grad(U, pred_vec, h, y)
-    # gU = np.dot(get_hidden(x, W, b), gb_tag)
-    dl_dh = np.dot(U, gb_tag)
-    relu_der = np.vectorize(ut.relu_derivative)
-    dh_dz1 = relu_der(np.dot(x, W) + b)
-    gb = np.dot(dl_dh, dh_dz1)
-    gW = np.dot(np.dot(dl_dh, x), dh_dz1)
-    loss = -np.log(pred_vec[y])
+    gU = (h * sub).T
+    dh_dz1 = U.T * ut.tanh_derivative(np.dot(x, W) + b)
+    gb = np.dot(sub.T, dh_dz1)[0]
+    gW = np.dot(sub.T, dh_dz1).T.dot(x.reshape(-1, 1).T).T
+    loss = 0
+    if pred_vec[y] > 0:
+        loss = -np.log(pred_vec[y])
     return loss, [gW, gb, gU, gb_tag]
 
 
@@ -74,9 +63,9 @@ def create_classifier(in_dim, hid_dim, out_dim):
     return:
     a flat list of 4 elements, W, b, U, b_tag.
     """
-    W = np.zeros((in_dim, hid_dim))
-    b = np.zeros(hid_dim)
-    U = np.zeros((hid_dim, out_dim))
-    b_tag = np.zeros(out_dim)
+    W = np.random.randn(in_dim, hid_dim)
+    b = np.random.randn(hid_dim)
+    U = np.random.randn(hid_dim, out_dim)
+    b_tag = np.random.randn(out_dim)
     return [W, b, U, b_tag]
 
