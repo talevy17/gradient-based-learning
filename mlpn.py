@@ -14,10 +14,6 @@ def classifier_output(x, params):
     zi = 0
     h = []
     h_curr = x
-    # for W, b in params:
-    #     h.append(h_curr)
-    #     zi, h_curr = single_layer_forward(h_curr, W, b)
-    # return ut.softmax(zi), h
     num_params = len(params)
     for i in range(0, num_params, 2):
         h.append(h_curr)
@@ -57,9 +53,9 @@ def loss_and_gradients(x, y, params):
         weights.append(params[i])
     gradients = []
     num_weights = len(weights)
+    index = 0
+    sub = (pred_vec - y_vec).reshape(-1, 1)
     for i in range(num_weights):
-        sub = (pred_vec - y_vec).reshape(-1, 1)
-        index = 0
         if i != index:
             sub = sub.T.dot((weights[index]).T * ut.tanh_derivative(bias[index])).T
             index += 1

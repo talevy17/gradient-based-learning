@@ -86,7 +86,7 @@ def bigram_model():
     learning_rate = 0.01
     learning_decay = 10
 
-    params = model.create_classifier([in_dim, 300, out_dim])
+    params = model.create_classifier([in_dim, 400, 200, 50, out_dim])
     trained_params = train_classifier(train_data, dev_data, params, f2I, l2I, learning_rate=learning_rate,
                                       learning_decay=learning_decay)
     # test_predictions(test_data, trained_params, f2I, i2L)
