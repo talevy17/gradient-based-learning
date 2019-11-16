@@ -77,6 +77,7 @@ def train_classifier(train_data, dev_data, params, f2I, l2I, feat_parser=feats_t
 
 
 def bigram_model():
+    print("The model will be trained on bigrams:\n")
     train_data = ut.TRAIN
     l2I = ut.L2I
     f2I = ut.F2I
@@ -97,6 +98,7 @@ def bigram_model():
 
 
 def unigram_model():
+    print("The model will be trained on unigrams:\n")
     train_data = ut.TRAIN_UNI
     l2I = ut.L2I_UNI
     f2I = ut.F2I_UNI
@@ -117,6 +119,7 @@ def unigram_model():
 
 
 def xor_model():
+    print("The model will be trained on the xor dataset:\n")
     train_data = xor_data
     dev_data = xor_data
     in_dim = 2
@@ -132,4 +135,6 @@ def xor_model():
 
 
 if __name__ == '__main__':
+    bigram_model()
+    unigram_model()
     xor_model()

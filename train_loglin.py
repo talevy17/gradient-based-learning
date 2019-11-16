@@ -73,7 +73,8 @@ def train_classifier(train_data, dev_data, num_iterations, learning_rate, learni
     return _params
 
 
-def main():
+def bigram_model():
+    print("The model will be trained on bigrams:\n")
     train_data = ut.TRAIN
     l2I = ut.L2I
     f2I = ut.F2I
@@ -92,5 +93,26 @@ def main():
     # test_predictions(test_data, trained_params, f2I, i2L)
 
 
+def unigram_model():
+    print("The model will be trained on unigrams:\n")
+    train_data = ut.TRAIN_UNI
+    l2I = ut.L2I_UNI
+    f2I = ut.F2I_UNI
+    # i2L = ut.I2L
+    dev_data = ut.DEV_UNI
+    # test_data = ut.TEST
+    in_dim = len(ut.vocab_uni)
+    out_dim = len(l2I)
+    num_iterations = 10
+    learning_rate = 0.01
+    learning_decay = 5
+
+    params = ll.create_classifier(in_dim, out_dim)
+    trained_params = train_classifier(train_data, dev_data, num_iterations, learning_rate, learning_decay, params, f2I,
+                                      l2I)
+    # test_predictions(test_data, trained_params, f2I, i2L)
+
+
 if __name__ == '__main__':
-    main()
+    bigram_model()
+    unigram_model()
