@@ -56,7 +56,7 @@ def train_classifier(train_data, dev_data, params, f2I, l2I, feat_parser=feats_t
     for I in range(num_iterations):
         cum_loss = 0.0  # total loss in this iteration.
         random.shuffle(train_data)
-        if I == learning_decay or I == learning_decay * 2:
+        if I == learning_decay:
             lr /= 10
         for label, features in train_data:
             x = feat_parser(features, f2I)  # convert features to a vector.
@@ -87,13 +87,13 @@ def bigram_model():
     in_dim = len(ut.vocab)
     out_dim = len(l2I)
     hid_dim = int(2 ** (math.floor(math.log(in_dim - out_dim))) / 2)
-    num_iterations = 30
-    learning_rate = 0.1
+    epochs = 10
+    learning_rate = 0.01
     learning_decay = 10
 
     params = model.create_classifier(in_dim, hid_dim, out_dim)
     trained_params = train_classifier(train_data, dev_data, params, f2I, l2I, learning_rate=learning_rate,
-                                      learning_decay=learning_decay)
+                                      learning_decay=learning_decay, num_iterations=epochs)
     # test_predictions(test_data, trained_params, f2I, i2L)
 
 
@@ -108,13 +108,13 @@ def unigram_model():
     in_dim = len(ut.vocab_uni)
     out_dim = len(l2I)
     hid_dim = int(2 ** (math.floor(math.log(in_dim - out_dim))) / 2)
-    num_iterations = 30
-    learning_rate = 1
+    epochs = 30
+    learning_rate = 0.01
     learning_decay = 10
 
     params = model.create_classifier(in_dim, hid_dim, out_dim)
     trained_params = train_classifier(train_data, dev_data, params, f2I, l2I, learning_rate=learning_rate,
-                                      learning_decay=learning_decay)
+                                      learning_decay=learning_decay, num_iterations=epochs)
     # test_predictions(test_data, trained_params, f2I, i2L)
 
 
@@ -125,16 +125,16 @@ def xor_model():
     in_dim = 2
     out_dim = 2
     hid_dim = 4
-    epochs = 20
+    epochs = 30
     f2I = lambda x: x
     l2I = {0: 0, 1: 1}
     params = model.create_classifier(in_dim, hid_dim, out_dim)
     trained_params = train_classifier(train_data, dev_data, params, f2I, l2I,
                                       feat_parser=lambda feats, x: np.asarray(feats),
-                                      num_iterations=epochs, learning_decay=5)
+                                      num_iterations=epochs)
 
 
 if __name__ == '__main__':
     bigram_model()
     unigram_model()
-    xor_model()
+    # xor_model()
