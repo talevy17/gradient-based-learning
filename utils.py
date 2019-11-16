@@ -22,6 +22,11 @@ def text_to_unigrams(text):
     return ["%s" % char for char in text]
 
 
+def get_hidden(x, W, b):
+    h = np.dot(x, W) + b
+    return np.tanh(h)
+
+
 def relu(x):
     '''
     relu function get max between(0,x)

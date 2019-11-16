@@ -1,9 +1,8 @@
-import mlp1 as model
+import mlpn as model
 import numpy as np
 import random
 import utils as ut
 import math
-from xor_data import data as xor_data
 
 STUDENT = {'name': 'Tal Levy',
            'ID': '---'}
@@ -51,7 +50,6 @@ def train_classifier(train_data, dev_data, params, f2I, l2I, feat_parser=feats_t
     learning_rate: the learning rate to use.
     params: list of parameters (initial values)
     """
-    W, b, U, b_tag = params
     lr = learning_rate
     for I in range(num_iterations):
         cum_loss = 0.0  # total loss in this iteration.
@@ -61,19 +59,18 @@ def train_classifier(train_data, dev_data, params, f2I, l2I, feat_parser=feats_t
         for label, features in train_data:
             x = feat_parser(features, f2I)  # convert features to a vector.
             y = l2I[label]  # convert the label to number if needed.
-            loss, grads = model.loss_and_gradients(x, y, [W, b, U, b_tag])
+            loss, grads = model.loss_and_gradients(x, y, params)
             cum_loss += loss
-            gW, gb, gU, gb_tag = grads
-            W -= gW * learning_rate
-            b -= gb * learning_rate
-            U -= gU * learning_rate
-            b_tag -= gb_tag * learning_rate
-
+            for i in range(0, len(params), 2):
+                params[i] -= learning_rate * grads[i]
+                b = params[i + 1]
+               # b = b.reshape(b.shape[0], 1)
+                params[i + 1] = np.squeeze((b - learning_rate * grads[i + 1].T).T)
         train_loss = cum_loss / len(train_data)
         train_accuracy = accuracy_on_dataset(train_data, params, f2I, l2I, feat_parser=feat_parser)
         dev_accuracy = accuracy_on_dataset(dev_data, params, f2I, l2I, feat_parser=feat_parser)
         print(I, train_loss, train_accuracy, dev_accuracy)
-    return [W, b, U, b_tag]
+    return params
 
 
 def bigram_model():
@@ -85,51 +82,15 @@ def bigram_model():
     test_data = ut.TEST
     in_dim = len(ut.vocab)
     out_dim = len(l2I)
-    hid_dim = int(2 ** (math.floor(math.log(in_dim - out_dim))) / 2)
     num_iterations = 30
-    learning_rate = 0.1
+    learning_rate = 0.01
     learning_decay = 10
 
-    params = model.create_classifier(in_dim, hid_dim, out_dim)
+    params = model.create_classifier([in_dim, 300, out_dim])
     trained_params = train_classifier(train_data, dev_data, params, f2I, l2I, learning_rate=learning_rate,
                                       learning_decay=learning_decay)
     # test_predictions(test_data, trained_params, f2I, i2L)
-
-
-def unigram_model():
-    train_data = ut.TRAIN_UNI
-    l2I = ut.L2I_UNI
-    f2I = ut.F2I_UNI
-    i2L = ut.I2L_UNI
-    dev_data = ut.DEV_UNI
-    test_data = ut.TEST
-    in_dim = len(ut.vocab_uni)
-    out_dim = len(l2I)
-    hid_dim = int(2 ** (math.floor(math.log(in_dim - out_dim))) / 2)
-    num_iterations = 30
-    learning_rate = 1
-    learning_decay = 10
-
-    params = model.create_classifier(in_dim, hid_dim, out_dim)
-    trained_params = train_classifier(train_data, dev_data, params, f2I, l2I, learning_rate=learning_rate,
-                                      learning_decay=learning_decay)
-    # test_predictions(test_data, trained_params, f2I, i2L)
-
-
-def xor_model():
-    train_data = xor_data
-    dev_data = xor_data
-    in_dim = 2
-    out_dim = 2
-    hid_dim = 4
-    epochs = 20
-    f2I = lambda x: x
-    l2I = {0: 0, 1: 1}
-    params = model.create_classifier(in_dim, hid_dim, out_dim)
-    trained_params = train_classifier(train_data, dev_data, params, f2I, l2I,
-                                      feat_parser=lambda feats, x: np.asarray(feats),
-                                      num_iterations=epochs, learning_decay=5)
 
 
 if __name__ == '__main__':
-    xor_model()
+    bigram_model()

@@ -1,16 +1,33 @@
 import numpy as np
+import utils as ut
 
 STUDENT = {'name': 'Tal Levy',
            'ID': '---'}
 
 
+def single_layer_forward(x, W, b):
+    z = np.dot(x, W) + b
+    return z, np.tanh(z)
+
+
 def classifier_output(x, params):
-    # YOUR CODE HERE.
-    return probs
+    zi = 0
+    h = []
+    h_curr = x
+    # for W, b in params:
+    #     h.append(h_curr)
+    #     zi, h_curr = single_layer_forward(h_curr, W, b)
+    # return ut.softmax(zi), h
+    num_params = len(params)
+    for i in range(0, num_params, 2):
+        h.append(h_curr)
+        zi, h_curr = single_layer_forward(h_curr, params[i], params[i + 1])
+    return ut.softmax(zi), h
 
 
 def predict(x, params):
-    return np.argmax(classifier_output(x, params))
+    probs, _ = classifier_output(x, params)
+    return np.argmax(probs)
 
 
 def loss_and_gradients(x, y, params):
@@ -30,8 +47,32 @@ def loss_and_gradients(x, y, params):
     (of course, if we request a linear classifier (ie, params is of length 2),
     you should not have gW2 and gb2.)
     """
-    # YOU CODE HERE
-    return ...
+    pred_vec, mem = classifier_output(x, params)
+    h = mem
+    y_vec = np.zeros(len(pred_vec))
+    y_vec[y] = 1
+    weights = []
+    bias = h[::-1]
+    for i in range(len(params) - 2, -1, -2):
+        weights.append(params[i])
+    gradients = []
+    num_weights = len(weights)
+    for i in range(num_weights):
+        sub = (pred_vec - y_vec).reshape(-1, 1)
+        index = 0
+        if i != index:
+            sub = sub.T.dot((weights[index]).T * ut.tanh_derivative(bias[index])).T
+            index += 1
+        gb = sub
+        gW = np.dot(sub, bias[index].reshape(-1, 1).T)
+        gW = gW.T
+        gradients.append(gb)
+        gradients.append(gW)
+    gradients = gradients[::-1]
+    loss = 0
+    if pred_vec[y] > 0:
+        loss = -np.log(pred_vec[y])
+    return loss, gradients
 
 
 def create_classifier(dims):
@@ -55,5 +96,11 @@ def create_classifier(dims):
     second layer, and so on.
     """
     params = []
+    for in_dim, out_dim in zip(dims, dims[1:]):
+        W = np.random.randn(in_dim, out_dim) * np.sqrt(2 / (out_dim + in_dim))
+        b = np.random.randn(out_dim) * np.sqrt(1 / out_dim)
+        b.reshape(b.shape[0], 1)
+        params.append(W)
+        params.append(b)
     return params
 
