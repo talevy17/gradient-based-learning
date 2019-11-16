@@ -74,7 +74,7 @@ def train_classifier(train_data, dev_data, num_iterations, learning_rate, learni
 
 
 def bigram_model():
-    print("The model will be trained on bigrams:\n")
+    print("The model will be trained on bigrams:")
     train_data = ut.TRAIN
     l2I = ut.L2I
     f2I = ut.F2I
@@ -94,7 +94,7 @@ def bigram_model():
 
 
 def unigram_model():
-    print("The model will be trained on unigrams:\n")
+    print("The model will be trained on unigrams:")
     train_data = ut.TRAIN_UNI
     l2I = ut.L2I_UNI
     f2I = ut.F2I_UNI
