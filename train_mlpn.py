@@ -64,7 +64,6 @@ def train_classifier(train_data, dev_data, params, f2I, l2I, feat_parser=feats_t
             for i in range(0, len(params), 2):
                 params[i] -= learning_rate * grads[i]
                 b = params[i + 1]
-               # b = b.reshape(b.shape[0], 1)
                 params[i + 1] = np.squeeze((b - learning_rate * grads[i + 1].T).T)
         train_loss = cum_loss / len(train_data)
         train_accuracy = accuracy_on_dataset(train_data, params, f2I, l2I, feat_parser=feat_parser)
@@ -82,13 +81,13 @@ def bigram_model():
     test_data = ut.TEST
     in_dim = len(ut.vocab)
     out_dim = len(l2I)
-    num_iterations = 30
+    epochs = 15
     learning_rate = 0.01
-    learning_decay = 10
+    learning_decay = 5
 
     params = model.create_classifier([in_dim, out_dim])
     trained_params = train_classifier(train_data, dev_data, params, f2I, l2I, learning_rate=learning_rate,
-                                      learning_decay=learning_decay)
+                                      learning_decay=learning_decay, num_iterations=epochs)
     # test_predictions(test_data, trained_params, f2I, i2L)
 
 

@@ -98,9 +98,9 @@ def unigram_model():
     train_data = ut.TRAIN_UNI
     l2I = ut.L2I_UNI
     f2I = ut.F2I_UNI
-    # i2L = ut.I2L
+    i2L = ut.I2L
     dev_data = ut.DEV_UNI
-    # test_data = ut.TEST
+    test_data = ut.TEST
     in_dim = len(ut.vocab_uni)
     out_dim = len(l2I)
     num_iterations = 10
@@ -115,4 +115,4 @@ def unigram_model():
 
 if __name__ == '__main__':
     bigram_model()
-    unigram_model()
+    # unigram_model()
