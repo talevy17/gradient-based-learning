@@ -59,10 +59,9 @@ def loss_and_gradients(x, y, params):
     gb = pred_vec - y_vec
     loss = -np.log(pred_vec[y])
     gW = np.zeros((rows, cols))
+    subtract = y_vec - pred_vec
     for i in range(rows):
-        for j in range(cols):
-            gW[i, j] = -x[i] * ((y == j) - pred_vec[j])
-
+            gW[i] = -x[i] * subtract
     return loss, [gW, gb]
 
 
