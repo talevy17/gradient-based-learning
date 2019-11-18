@@ -96,6 +96,7 @@ I2L_UNI = {i: l for i, l in enumerate(list(sorted(set([l for l, t in TRAIN_UNI])
 # feature strings (bigrams) to IDs
 F2I_UNI = {f: i for i, f in enumerate(list(sorted(vocab_uni)))}
 
+
 def xavier_init(in_dim, out_dim = None):
     if out_dim is None:
         return np.random.randn(in_dim)/np.sqrt(in_dim/2)
